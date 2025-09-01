@@ -1,5 +1,6 @@
 const { default: mongoose } = require("mongoose");
 const Deck = require("../models/deckModel");
+const Card = require("../models/cardModel");
 const invalidIdCheck = require("../config/invalidIdChecker");
 
 const createDeck = async (req, res) => {
@@ -61,5 +62,20 @@ const getDecks = async (req, res) => {
     res.status(500).send({ success: false, message: "Internal server error" });
   }
 };
+const deleteDeck = async (req, res) => {
+  try {
+    const deckId = req.params.deckId;
+    const _id = new mongoose.Types.ObjectId(deckId);
+    const result = await Deck.deleteOne({_id});
+    if(result.deletedCount === 0){
+      return res.status(404).send({success:false, message:"No deck found to be deleted."})
+    }
+    const deleteAllCards = await Card.deleteMany({deckId: _id});
+    res.status(200).send({success:true, message:"Deck and all the cards inside the deck have been deleted successfully.", data: deleteAllCards});
+  } catch (error) {
+    console.log("There was an error deleting the deck.", error);
+    res.status(500).send({ success: false, message: "Internal server error" });
+  }
+}
 
-module.exports = { createDeck, updateDeck, getDecks };
+module.exports = { createDeck, updateDeck, getDecks , deleteDeck};

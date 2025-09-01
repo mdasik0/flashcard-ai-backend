@@ -21,21 +21,21 @@ const createFlashcard = async (req, res) => {
       (key) => !incomingFields.includes(key)
     );
 
-    if (missingFields) {
+    if (missingFields.length > 0) {
       return res.status(400).send({
         success: false,
         message: "Flashcard object validation failed: missing required fields",
         missingFields,
       });
-    }
+    } 
 
     await Card.create(newFlashcardData);
 
-    res
+    return res
       .status(200)
       .send({ success: true, message: `Flashcard is added to the Deck` });
   } catch (error) {
-    console.log("There was an error adding the Flashcard.");
+    console.log("There was an error adding the Flashcard.",error);
     res
       .status(400)
       .send({ success: false, message: "internal server error", error: error });
