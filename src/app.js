@@ -6,6 +6,7 @@ const cardRoutes = require('./routes/cardRoute');
 const connectToDB = require('./config/database');
 const userRoute = require('./routes/userRoute');
 const deckRoute = require('./routes/deckRoute');
+const aiRoute = require('./routes/aiRoute');
 require('dotenv').config();
 const app = express();
 
@@ -29,6 +30,7 @@ if (process.env.NODE_ENV === 'development') {
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+app.use('/api/ai', aiRoute)
 app.use('/api/users', userRoute);
 app.use('/api', cardRoutes)
 app.use('/api', deckRoute)
