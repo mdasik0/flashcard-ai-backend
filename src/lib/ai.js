@@ -1,4 +1,4 @@
-const generateFlashcard = async (question) => {
+const generateFlashcard = async (question, deckName) => {
   const api_key = process.env.OPENROUTER_API_KEY;
   if (!api_key) {
     throw new Error("OPEN ROUTER API key not found");
@@ -16,23 +16,30 @@ const generateFlashcard = async (question) => {
         messages: [
           {
             role: "system",
-            content: `You are a helpful assistant that generates educational flashcards. 
-            
-            CRITICAL REQUIREMENTS:
-            1. Generate EXACTLY flashcards only
-            2. Each answer must be under 20 words
-            3. Return ONLY this JSON format: [{"question":"...","answer":"..."}]
-            4. NO extra text, explanations, or formatting
-            5. If input unclear, return: {"error":"Please provide a clear educational topic"}
-            
-            Example output: [{"question":"What is photosynthesis?","answer":"Process where plants convert light into energy using chlorophyll"}]`,
-          }
+            content: `You are an assistant that generates educational flashcards.
+
+                CRITICAL RULES:
+                1. Output must be JSON only, no extra text.
+                2. JSON format: [{"question":"...","answer":"..."}]
+                3. Each answer must be concise (max 20 words).
+                4. Generate only flashcards; do not include explanations or formatting.
+                5. If input is unclear, output: {"error":"Please provide a clear educational topic"}.
+
+                Example output:
+                [{"question":"What is photosynthesis?","answer":"Process where plants convert light into energy using chlorophyll"}]`,
+          },
+          {
+            role: "user",
+            content: `Generate an answer by understanding the question: "${question}". 
+            If the question is unclear, use the deck topic as a hint. 
+            Caution: the deck name may be empty sometimes. 
+            Deck: "${deckName}"`,
+          },
         ],
       }),
     });
     const data = await res.json();
-      return { answer: data };
-
+    return {success:true, response: data.choices[0].message.content };
   } catch (error) {
     console.log("Error in ai.js:", error);
     throw new Error({
@@ -40,7 +47,6 @@ const generateFlashcard = async (question) => {
       message: "There was an error in generateFlashcard",
     });
   }
-
 };
 
 module.exports = generateFlashcard;

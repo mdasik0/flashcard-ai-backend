@@ -4,7 +4,7 @@ const router = express.Router();
 
 router.get('/generate-flashcard', async (req, res) => {
     try {
-        const {question} = req.body;
+        const {question, deckName} = req.body;
 
         if(question === undefined || question.length === "" || typeof question !== 'string'){
             return res.status(400).send({success: false, message: "Question is required and must be a string"});
@@ -18,7 +18,7 @@ router.get('/generate-flashcard', async (req, res) => {
             return res.status(400).send({success: false, message: "Question must be less than 100 characters long",queLength : trimmedQuestion.length});
         }
 
-        const result = await generateFlashcard(trimmedQuestion);
+        const result = await generateFlashcard(trimmedQuestion, deckName);
         return res.send({result,queLength : trimmedQuestion.length})
     } catch (error) {
         console.log("Error generating flashcard", error);
