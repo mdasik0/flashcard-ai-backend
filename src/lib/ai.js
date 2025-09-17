@@ -30,16 +30,16 @@ const generateFlashcard = async (question, deckName) => {
           },
           {
             role: "user",
-            content: `Generate an answer by understanding the question: "${question}". 
-            If the question is unclear, use the deck topic as a hint. 
-            Caution: the deck name may be empty sometimes. 
+            content: `Generate an answer by understanding the question: "${question}".
+            If the question is unclear, use the deck topic as a hint.
+            Caution: the deck name may be empty sometimes.
             Deck: "${deckName}"`,
           },
         ],
       }),
     });
     const data = await res.json();
-    return {success:true, response: data.choices[0].message.content };
+    return { success: true, response: data.choices[0].message.content };
   } catch (error) {
     console.log("Error in ai.js:", error);
     throw new Error({
