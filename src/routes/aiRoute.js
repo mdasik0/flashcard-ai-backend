@@ -2,7 +2,7 @@ const express = require('express');
 const generateFlashcard = require('../lib/ai');
 const router = express.Router();
 
-router.get('/generate-flashcard', async (req, res) => {
+router.post('/generate-flashcard', async (req, res) => {
     try {
         const {question, deckName} = req.body;
 
@@ -19,7 +19,13 @@ router.get('/generate-flashcard', async (req, res) => {
         }
 
         const result = await generateFlashcard(trimmedQuestion, deckName);
-        return res.send({result,queLength : trimmedQuestion.length})
+        if(!result.success){
+            return res.status(500).send({success: false, message: "Failed to generate flashcard"});
+        }
+        const response = {success: true, response:{question : trimmedQuestion, answer: result.response}}
+        
+        console.log('result sent to client:', response)
+        return res.status(200).json(response)
     } catch (error) {
         console.log("Error generating flashcard", error);
         res.status(500).send({success: false, message: "Internal Server Error"});
