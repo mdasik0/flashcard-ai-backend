@@ -30,10 +30,7 @@ const generateFlashcard = async (question, deckName) => {
           // },
           {
             role: "user",
-            content: `Generate an simplest answer by understanding the question: "${question}".
-            If the question is unclear, use the deck topic as a hint. if there is "<s>" in your answer remove it. answer shouldn't more the 20 words.
-            Caution: the deck name may be empty sometimes.
-            Deck: "${deckName}"`,
+            content: `Process the natural language of the question to understandable ai Prompt, Now understand the question through that ai prompt. Answer the question within 20 words(no more then 20 words). Simple, concise, to the point. Answer must not contain " <s> ". - Here is the question: ${question}.`,
           },
         ],
       }),
