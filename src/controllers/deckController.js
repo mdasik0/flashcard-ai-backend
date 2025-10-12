@@ -1,7 +1,6 @@
 const { default: mongoose } = require("mongoose");
 const Deck = require("../models/deckModel");
 const Card = require("../models/cardModel");
-const invalidIdCheck = require("../config/invalidIdChecker");
 
 const createDeck = async (req, res) => {
   try {
