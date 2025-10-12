@@ -6,11 +6,32 @@ const invalidIdCheck = require("../config/invalidIdChecker");
 const createDeck = async (req, res) => {
   try {
     const deckData = req.body;
-    const result = await Deck.create(deckData);
-    res.send({ success: true, message: "New deck created", data: result });
+    // validate deckData
+    if (!deckData.deckName || !deckData.creatorId) {
+      return res.status(400).send({
+        success: false,
+        message: "Missing required fields : deckName or creatorId",
+      });
+    }
+    // set active field
+    const deckExist = await Deck.find({ creatorId: deckData?.creatorId });
+    if (!deckExist) {
+      const deckDataWithActiveField = { ...deckData, active: true };
+      const result = await Deck.create(deckDataWithActiveField);
+      return res
+        .status(200)
+        .send({ success: true, message: "New deck created", data: result });
+    }
+    const deckDataWithActiveField = { ...deckData, active: false };
+    const result = await Deck.create(deckDataWithActiveField);
+    return res
+      .status(200)
+      .send({ success: true, message: "New deck created", data: result });
   } catch (error) {
     console.log("There was an error creating Deck.", error);
-    res.status(500).send({ success: false, message: "Internal server error" });
+    return res
+      .status(500)
+      .send({ success: false, message: "Internal server error" });
   }
 };
 
@@ -38,13 +59,11 @@ const updateDeck = async (req, res) => {
         message: "there is nothing to be updated",
       });
     }
-    res
-      .status(200)
-      .send({
-        success: true,
-        message: "Deck has been updated Successfully",
-        data: result,
-      });
+    res.status(200).send({
+      success: true,
+      message: "Deck has been updated Successfully",
+      data: result,
+    });
   } catch (error) {
     console.log("There was an error updating deck", error);
     res.status(500).send({ success: false, message: "Internal server error" });
@@ -80,14 +99,12 @@ const deleteDeck = async (req, res) => {
         .send({ success: false, message: "No deck found to be deleted." });
     }
     const deleteAllCards = await Card.deleteMany({ deckId: _id });
-    res
-      .status(200)
-      .send({
-        success: true,
-        message:
-          "Deck and all the cards inside the deck have been deleted successfully.",
-        data: deleteAllCards,
-      });
+    res.status(200).send({
+      success: true,
+      message:
+        "Deck and all the cards inside the deck have been deleted successfully.",
+      data: deleteAllCards,
+    });
   } catch (error) {
     console.log("There was an error deleting the deck.", error);
     res.status(500).send({ success: false, message: "Internal server error" });
