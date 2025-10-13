@@ -14,17 +14,14 @@ const createDeck = async (req, res) => {
     }
     // set active field
     const deckExist = await Deck.find({ creatorId: deckData?.creatorId });
-    console.log('deck data:', deckExist, !deckExist)
     if (deckExist.length <= 0) {
       const deckDataWithActiveField = { ...deckData, active: true };
-      console.log(deckDataWithActiveField)
       const result = await Deck.create(deckDataWithActiveField);
       return res
         .status(200)
         .send({ success: true, message: "New deck created", data: result });
     }
     else {
-      console.log('deck exists')
       const deckDataWithActiveField = { ...deckData, active: false };
       const result = await Deck.create(deckDataWithActiveField);
       return res
