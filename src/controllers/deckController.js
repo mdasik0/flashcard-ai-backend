@@ -35,7 +35,56 @@ const createDeck = async (req, res) => {
       .send({ success: false, message: "Internal server error" });
   }
 };
-
+const setActiveDeck = async (req, res) => {
+  const deckId = req.params.deckId;
+  try {
+    const _id = new mongoose.Types.ObjectId(deckId);
+    
+    // Find the currently active deck
+    const oldActive = await Deck.findOne({ active: true });
+    
+    // Check if the requested deck is already active
+    if (oldActive && oldActive._id.toString() === deckId) {
+      return res.status(200).json({ 
+        success: false, 
+        message: 'This deck is already active.' 
+      });
+    }
+    
+    // If there's a different active deck, deactivate it
+    if (oldActive) {
+      await Deck.updateOne(
+        { _id: oldActive._id },
+        { $set: { active: false } }
+      );
+    }
+    
+    // Set the new deck as active
+    const result = await Deck.updateOne(
+      { _id },
+      { $set: { active: true } }
+    );
+    
+    if (result.matchedCount > 0) {
+      return res.status(200).json({ 
+        success: true, 
+        message: 'Successfully set the deck active' 
+      });
+    } else {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Deck not found' 
+      });
+    }
+    
+  } catch (error) {
+    console.log('There was an error trying to set deck as active:', error.message);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Internal server error' 
+    });
+  }
+};
 const updateDeck = async (req, res) => {
   try {
     const deckId = req.params.deckId;
@@ -112,4 +161,4 @@ const deleteDeck = async (req, res) => {
   }
 };
 
-module.exports = { createDeck, updateDeck, getDecks, deleteDeck };
+module.exports = { createDeck, updateDeck, getDecks, deleteDeck, setActiveDeck };
