@@ -8,4 +8,6 @@ router.patch('/set-active-deck/:deckId',setActiveDeck);
 router.get('/decks/:creatorId',getDecks);
 router.delete('/deck/:deckId',deleteDeck);
 
+console.log('making changes')
+
 module.exports = router;
